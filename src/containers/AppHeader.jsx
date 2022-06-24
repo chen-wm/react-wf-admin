@@ -10,17 +10,17 @@ const AppHeader = props => {
         <Menu>
             <Menu.ItemGroup title='用户设置'>
                 <Menu.Divider />
-                <Menu.Item>
+                <Menu.Item key={0}>
                     <Icon type='edit' />
                     个人设置
                 </Menu.Item>
-                <Menu.Item>
+                <Menu.Item key={1}>
                     <Icon type='setting' theme='filled' />
                     系统设置
                 </Menu.Item>
             </Menu.ItemGroup>
             <Menu.Divider />
-            <Menu.Item>
+            <Menu.Item key={2}>
                 <span onClick={loginOut}>
                     <Icon type='logout' /> 退出登录
                 </span>
