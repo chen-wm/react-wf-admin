@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
 import { Layout, Input, Icon, Form, Button, Divider, message, notification } from 'antd'
 import { withRouter } from 'react-router-dom'
-// import axios from '@/api'
-// import { API } from '@/api/config'
+import { Provider } from 'react-redux'
 import '@/style/view-style/login.scss'
 import { login } from '../../api/list'
+import store from '@/store'
 
 class Login extends Component {
+    constructor(props) {
+        super(props)
+    }
     state = {
-        loading: false
+        loading: false,
+        ...store.getState()
     }
 
     enterLoading = () => {
@@ -18,23 +22,17 @@ class Login extends Component {
     }
 
     handleSubmit = e => {
-        console.log(process.env)
         e.preventDefault()
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 values.accountType = 'us168-admin'
                 login(values)
                     .then(res => {
-                        console.log(res)
-                        switch (values.username) {
-                            case 'admin':
-                                values.auth = 0
-                                break
-                            default:
-                                values.auth = 1
+                        const action = {
+                            type: 'SET_TOKEN',
+                            userInfo: res.data
                         }
-
-                        localStorage.setItem('user', JSON.stringify(values))
+                        store.dispatch(action)
                         this.enterLoading()
                         this.timer = setTimeout(() => {
                             message.success('登录成功!')
@@ -44,34 +42,8 @@ class Login extends Component {
                     .catch(e => {
                         console.log(e)
                     })
-
-                // let { username, password } = values
-                // axios
-                //     .post(`${API}/login`, { username, password })
-                //     .then(res => {
-                //         if (res.data.code === 0) {
-                //             localStorage.setItem('user', JSON.stringify(res.data.data.user))
-                //             localStorage.setItem('token', res.data.data.token)
-                //             this.props.history.push('/')
-                //             message.success('登录成功!')
-                //         } else {
-                //             // 这里处理一些错误信息
-                //         }
-                //     })
-                //     .catch(err => {})
-
-                // 这里可以做权限校验 模拟接口返回用户权限标识
             }
         })
-    }
-
-    componentDidMount() {
-        console.log(5555, process.env)
-        // notification.open({
-        //     message: '欢迎使用后台管理平台',
-        //     duration: null,
-        //     description: '账号 admin(管理员) 其他(游客) 密码随意'
-        // })
     }
 
     componentWillUnmount() {
@@ -82,47 +54,48 @@ class Login extends Component {
     render() {
         const { getFieldDecorator } = this.props.form
         return (
-            <Layout className='login animated fadeIn'>
-                <div className='model'>
-                    <div className='login-form'>
-                        <h3>万福权限后台管理系统</h3>
-                        <Divider />
-                        <Form onSubmit={this.handleSubmit}>
-                            <Form.Item>
-                                {getFieldDecorator('username', {
-                                    rules: [{ required: true, message: '请输入用户名!' }]
-                                })(
-                                    <Input
-                                        prefix={<Icon type='user' style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                        placeholder='用户名'
-                                    />
-                                )}
-                            </Form.Item>
-                            <Form.Item>
-                                {getFieldDecorator('password', {
-                                    rules: [{ required: true, message: '请输入密码' }]
-                                })(
-                                    <Input
-                                        prefix={<Icon type='lock' style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                        type='password'
-                                        placeholder='密码'
-                                    />
-                                )}
-                            </Form.Item>
-                            <Form.Item>
-                                {' '}
-                                <Button
-                                    type='primary'
-                                    htmlType='submit'
-                                    className='login-form-button'
-                                    loading={this.state.loading}>
-                                    登录
-                                </Button>
-                            </Form.Item>
-                        </Form>
+            <Provider store={store}>
+                <Layout className='login animated fadeIn'>
+                    <div className='model'>
+                        <div className='login-form'>
+                            <h3>万福权限后台管理系统</h3>
+                            <Divider />
+                            <Form onSubmit={this.handleSubmit}>
+                                <Form.Item>
+                                    {getFieldDecorator('username', {
+                                        rules: [{ required: true, message: '请输入用户名!' }]
+                                    })(
+                                        <Input
+                                            prefix={<Icon type='user' style={{ color: 'rgba(0,0,0,.25)' }} />}
+                                            placeholder='用户名'
+                                        />
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    {getFieldDecorator('password', {
+                                        rules: [{ required: true, message: '请输入密码' }]
+                                    })(
+                                        <Input
+                                            prefix={<Icon type='lock' style={{ color: 'rgba(0,0,0,.25)' }} />}
+                                            type='password'
+                                            placeholder='密码'
+                                        />
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button
+                                        type='primary'
+                                        htmlType='submit'
+                                        className='login-form-button'
+                                        loading={this.state.loading}>
+                                        登录
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </div>
                     </div>
-                </div>
-            </Layout>
+                </Layout>
+            </Provider>
         )
     }
 }

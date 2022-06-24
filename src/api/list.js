@@ -14,4 +14,13 @@ export function login(data) {
   });
 }
 
+//  退出登录
+export function logOut(data) {
+  return request({
+    url: `${$C.auth}/auth/logout`,
+    method: 'post',
+    data
+  });
+}
+
 export const getUserList = params => postAction(`${$C.auth}/user/list`, params);

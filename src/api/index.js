@@ -1,13 +1,11 @@
 import axios from 'axios';
 import {  message } from 'antd';
-// import { getToken } from '@/utils/auth';
-// eslint-disable-next-line
 import { baseUrl } from './config';
-// import Vue from 'vue';
-// import FingerprintJS from '@fingerprintjs/fingerprintjs';
-
 import $C from './config';
 import { Decrypt, Encrypt } from './ase.js';
+import { useHistory } from "react-router-dom"
+import { getToken } from '@/utils/auth';
+
 let unAse = false;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 // create an axios instance
@@ -31,10 +29,10 @@ service.interceptors.request.use(
         }
         //  字符串截取
         // 是否需要设置 token
-        // const isToken = (config.headers || {}).isToken === false;
-        // if (getToken() && !isToken) {
-        //     config.headers['Authorization'] = 'Bearer ' + getToken(); // 让每个请求携带自定义token 请根据实际情况自行修改
-        // }
+        const isToken = (config.headers || {}).isToken === false;
+        if (getToken() && !isToken) {
+            config.headers['Authorization'] = 'Bearer ' + getToken(); // 让每个请求携带自定义token 请根据实际情况自行修改
+        }
         config.headers['X-Application-Name'] = $C.applicationName;
         config.headers['X-Source'] = 'pc';
         config.headers['X-Version'] = '1.0.0';
@@ -125,24 +123,8 @@ service.interceptors.response.use(
         if (res.code !== 0) {
             // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
             if (res.code === 1102 || res.code === 1101 || res.code === 1103|| res.code === 1500) {
+                useHistory.push("/login")
                 message.error(res.message)
-                // to re-login
-                // MessageBox.confirm(
-                //     '您已注销，您可以取消停留在此页面，或重新登录',
-                //     '重新登录',
-                //     {
-                //         confirmButtonText: 'Re-Login',
-                //         cancelButtonText: 'Cancel',
-                //         type: 'warning'
-                //     }
-                // ).then(() => {
-                //     store
-                //     .dispatch('LogOut')
-                //     .then(() => {
-                //         location.reload();
-                //     })
-                //     .catch(() => {});
-                // });
             }
             switch (res.code) {
             case 1101:

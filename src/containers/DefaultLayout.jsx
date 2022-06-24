@@ -8,10 +8,11 @@ import echarts from 'echarts/lib/echarts'
 import avatar from '@/assets/images/user.jpg'
 import menu from './menu'
 import '@/style/layout.scss'
-
+import store from '@/store'
 import AppHeader from './AppHeader.jsx'
 import AppAside from './AppAside.jsx'
 import AppFooter from './AppFooter.jsx'
+import {logOut} from '../api/list'
 
 const { Content } = Layout
 
@@ -19,7 +20,7 @@ class DefaultLayout extends Component {
     state = {
         avatar,
         show: true,
-        menu: []
+        menu: [],
     }
 
     isLogin = () => {
@@ -33,9 +34,15 @@ class DefaultLayout extends Component {
     }
 
     loginOut = () => {
-        localStorage.clear()
+        logOut().then( res =>{
+            if(res.code===0){
+                localStorage.clear()
+            }
+        }).catch(e=>{
+            message.error(e)
+        })
         this.props.history.push('/login')
-        message.success('登出成功!')
+        message.success('退出登录成功!')
     }
     getMenu = menu => {
         let newMenu,
@@ -128,9 +135,4 @@ const dispatchToProp = dispatch => ({
     }
 })
 
-export default withRouter(
-    connect(
-        stateToProp,
-        dispatchToProp
-    )(DefaultLayout)
-)
+export default withRouter(connect(stateToProp, dispatchToProp)(DefaultLayout))
