@@ -29,8 +29,9 @@ service.interceptors.request.use(
         //  字符串截取
         // 是否需要设置 token
         const isToken = (config.headers || {}).isToken === false
+        const token = JSON.parse(getToken())
         if (getToken() && !isToken) {
-            config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            config.headers['Authorization'] = 'Bearer ' + token // 让每个请求携带自定义token 请根据实际情况自行修改
         }
         config.headers['X-Application-Name'] = $C.applicationName
         config.headers['X-Source'] = 'pc'
@@ -116,7 +117,7 @@ service.interceptors.response.use(
         if (res.code !== 0) {
             // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
             if (res.code === 1102 || res.code === 1101 || res.code === 1103 || res.code === 1500) {
-                useHistory.push('/login')
+                // useHistory.push('/login')
                 message.error(res.message)
             }
             switch (res.code) {

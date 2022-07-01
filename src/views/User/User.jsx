@@ -12,6 +12,7 @@ const User = () => {
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(false)
     const [title, setTitle] = useState(null)
+    const [flag, setFlag] = useState('')
     const [queryParams, setQueryParams] = useState({
         current: 1,
         size: 10
@@ -42,7 +43,10 @@ const User = () => {
                             okText='确认'
                             cancelText='取消'
                             title='是否删除选中数据?'
-                            onConfirm={() => showDeleteConfirm(record.id)}>
+                            onConfirm={() => {
+                                showDeleteConfirm(record.id)
+                                setFlag('edit')
+                            }}>
                             <a>删除</a>
                         </Popconfirm>
                     </span>
@@ -58,7 +62,7 @@ const User = () => {
                 }
             })
             .catch(e => {
-                message.error(e)
+                // message.error(e)
             })
     }
     const onFinish = values => {
@@ -83,7 +87,7 @@ const User = () => {
                 message.error(e)
             })
     }
-
+    const props = { visible, title, flag }
     return (
         <Layout>
             <div>
@@ -115,6 +119,7 @@ const User = () => {
                         onClick={() => {
                             setVisible(true)
                             setTitle('新增')
+                            setFlag('add')
                         }}>
                         新增
                     </Button>
@@ -122,11 +127,11 @@ const User = () => {
                 <Table dataSource={dataSource} loading={loading} columns={columns} rowKey='id' />
             </div>
             <ModalDialog
-                visible={visible}
-                title={title}
+                {...props}
                 onHide={() => {
                     setVisible(false)
                 }}
+                refreshList={loadData}
             />
         </Layout>
     )
