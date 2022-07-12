@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Layout, message } from 'antd'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
 import { getUserList } from '@/api/list'
-import { Form, Row, Input, Button, Table, Divider, Modal, Popconfirm } from 'antd'
+import { Form, Row, Input, Button, Table, Divider, Popconfirm } from 'antd'
 import { removeUser } from '../../api/list'
 import ModalDialog from './Modal'
 
@@ -13,12 +13,13 @@ const User = () => {
     const [visible, setVisible] = useState(false)
     const [title, setTitle] = useState(null)
     const [flag, setFlag] = useState('')
+    const [total, setTotal] = useState(null)
+    const [record, setRecord] = useState(null)
     const [queryParams, setQueryParams] = useState({
         current: 1,
         size: 10
     })
     useEffect(() => {
-        setLoading(true)
         loadData()
     }, [queryParams])
     const columns = [
@@ -36,7 +37,14 @@ const User = () => {
             render: (text, record) =>
                 dataSource.length >= 1 ? (
                     <span>
-                        <a>修改</a>
+                        <a
+                            onClick={() => {
+                                setRecord(record)
+                                setVisible(true)
+                                setFlag('edit')
+                            }}>
+                            修改
+                        </a>
                         <Divider type='vertical' />
 
                         <Popconfirm
@@ -45,7 +53,6 @@ const User = () => {
                             title='是否删除选中数据?'
                             onConfirm={() => {
                                 showDeleteConfirm(record.id)
-                                setFlag('edit')
                             }}>
                             <a>删除</a>
                         </Popconfirm>
@@ -53,28 +60,17 @@ const User = () => {
                 ) : null
         }
     ]
-    const loadData = () => {
-        getUserList(queryParams)
+    const loadData = data => {
+        setLoading(true)
+        getUserList({ ...queryParams, ...data })
             .then(res => {
                 if (res.code === 0) {
                     setDataSource(res.data.records)
                     setLoading(false)
+                    setTotal(res.data.total)
                 }
             })
-            .catch(e => {
-                // message.error(e)
-            })
-    }
-    const onFinish = values => {
-        setQueryParams(prevState => {
-            return { ...prevState, ...values }
-        })
-    }
-    const handleReset = () => {
-        setQueryParams({
-            current: 1,
-            size: 10
-        })
+            .catch(e => {})
     }
     const showDeleteConfirm = data => {
         removeUser({ id: data })
@@ -87,14 +83,30 @@ const User = () => {
                 message.error(e)
             })
     }
-    const props = { visible, title, flag }
+    const paginationProps = {
+        showSizeChanger: false, //设置每页显示数据条数
+        showQuickJumper: false,
+        showTotal: () => `共${total}条`,
+        pageSize: queryParams.size,
+        total
+    }
+    const handleTableChange = newPagination => {
+        loadData(newPagination)
+    }
+    const props = { visible, title, flag, record }
     return (
         <Layout>
             <div>
                 <CustomBreadcrumb arr={['用户管理']} />
             </div>
             <div className='base-style '>
-                <Form layout='inline' form={form} name='control-hooks' onFinish={onFinish}>
+                <Form
+                    layout='inline'
+                    form={form}
+                    name='control-hooks'
+                    onFinish={values => {
+                        loadData(values)
+                    }}>
                     <Row>
                         <Form.Item label='用户昵称' name='nickname'>
                             <Input placeholder='请输入用户昵称' allowClear />
@@ -106,7 +118,12 @@ const User = () => {
                             <Button type='primary' htmlType='submit'>
                                 搜索
                             </Button>
-                            <Button style={{ marginLeft: 8 }} onClick={handleReset}>
+                            <Button
+                                style={{ marginLeft: 8 }}
+                                onClick={() => {
+                                    form.resetFields()
+                                    loadData()
+                                }}>
                                 重置
                             </Button>
                         </Form.Item>
@@ -124,7 +141,14 @@ const User = () => {
                         新增
                     </Button>
                 </div>
-                <Table dataSource={dataSource} loading={loading} columns={columns} rowKey='id' />
+                <Table
+                    dataSource={dataSource}
+                    onChange={handleTableChange}
+                    pagination={paginationProps}
+                    loading={loading}
+                    columns={columns}
+                    rowKey='id'
+                />
             </div>
             <ModalDialog
                 {...props}

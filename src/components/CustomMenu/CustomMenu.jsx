@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Menu, Icon } from 'antd'
+import { Menu } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 
 class CustomMenu extends Component {
@@ -65,23 +65,25 @@ class CustomMenu extends Component {
         }
     }
 
-    renderMenuItem = ({ key, icon, title }) => (
+    renderMenuItem = ({ key, title }) => (
         <Menu.Item key={key}>
-            <Link to={key}>
-                {icon && <Icon type={icon} />}
+            <Link
+                to={key}
+                onClick={() => {
+                    console.log(key, title)
+                }}>
                 <span>{title}</span>
             </Link>
         </Menu.Item>
     )
 
     // 循环遍历数组中的子项 subs ，生成子级 menu
-    renderSubMenu = ({ key, icon, title, subs }) => {
+    renderSubMenu = ({ key, title, subs }) => {
         return (
             <Menu.SubMenu
                 key={key}
                 title={
                     <span>
-                        {icon && <Icon type={icon} />}
                         <span>{title}</span>
                     </span>
                 }>

@@ -1,5 +1,5 @@
-import React, { Component, useState } from 'react'
-import { Layout, Input, Icon, Form, Button, Divider, message, notification } from 'antd'
+import React, { useState } from 'react'
+import { Layout, Input, Icon, Form, Button, Divider, message } from 'antd'
 import { withRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import '@/style/view-style/login.scss'

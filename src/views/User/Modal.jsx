@@ -1,13 +1,29 @@
-import { Button, Form, Input, message, Modal, Row, Space } from 'antd'
-import React, { useState, useEffect, useRef } from 'react'
+import { Form, Input, message, Modal, Space } from 'antd'
+import React, { useEffect } from 'react'
 import { addUser, writeUser } from '../../api/list'
 
-const ModalDialog = props => {
+const ModalDialog = ({ flag, title, visible, onHide, refreshList, record }) => {
     const [form] = Form.useForm()
-    const { flag, title, visible, onHide, refreshList } = props
+    useEffect(() => {
+        if (visible && flag === 'edit') {
+            console.log(record)
+            setTimeout(() => {
+                form.setFieldsValue({
+                    nickname: record.nickname,
+                    password: record.password,
+                    username: record.username
+                })
+            }, 0)
+        }
+    }, [visible])
     const onFinish = () => {
         let action = flag === 'add' ? addUser : writeUser
-        action(form.getFieldValue())
+        console.log(5, form.getFieldValue())
+        let params = { ...form.getFieldValue() }
+        if (flag === 'edit') {
+            params.id = record.id
+        }
+        action(params)
             .then(res => {
                 if (res.code === 0) {
                     message.success(`${flag === 'add' ? '新增用户成功' : '修改用户成功'}`)
@@ -20,7 +36,16 @@ const ModalDialog = props => {
             })
             .catch(e => {
                 console.log(e)
+                form.resetFields()
             })
+    }
+
+    const cumstomSubmit = () => {
+        form.validateFields()
+            .then(values => {
+                form.submit()
+            })
+            .catch(errorInfo => {})
     }
 
     const formItemLayout = {
@@ -29,8 +54,15 @@ const ModalDialog = props => {
     }
 
     return (
-        <Modal title={title} visible={visible} onOk={onFinish} onCancel={onHide} okText='确认' cancelText='取消'>
-            <Form layout='inline' form={form} name='control-hooks' onFinish={onFinish}>
+        <Modal
+            title={title}
+            visible={visible}
+            destroyOnClose={true}
+            onOk={cumstomSubmit}
+            onCancel={onHide}
+            okText='确认'
+            cancelText='取消'>
+            <Form layout='inline' form={form} name='control-hooks' preserve={false} onFinish={onFinish}>
                 <Space
                     direction='vertical'
                     size='middle'
@@ -61,16 +93,6 @@ const ModalDialog = props => {
                         rules={[{ required: true, message: '请输入用户名8-32位数', min: 8, max: 32 }]}>
                         <Input placeholder='请输入用户名' allowClear />
                     </Form.Item>
-                    {/*<Form.Item*/}
-                    {/*    wrapperCol={{*/}
-                    {/*        offset: 8,*/}
-                    {/*        span: 16,*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    <Button type="primary" htmlType="submit">*/}
-                    {/*        Submit*/}
-                    {/*    </Button>*/}
-                    {/*</Form.Item>*/}
                 </Space>
             </Form>
         </Modal>

@@ -2,7 +2,6 @@ import axios from 'axios'
 import { message } from 'antd'
 import $C from './config'
 import { Decrypt, Encrypt } from './ase.js'
-import { useHistory } from 'react-router-dom'
 import { getToken } from '@/utils/auth'
 
 let unAse = false
@@ -117,7 +116,6 @@ service.interceptors.response.use(
         if (res.code !== 0) {
             // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
             if (res.code === 1102 || res.code === 1101 || res.code === 1103 || res.code === 1500) {
-                // useHistory.push('/login')
                 message.error(res.message)
             }
             switch (res.code) {
