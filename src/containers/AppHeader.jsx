@@ -1,11 +1,35 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Menu, Dropdown, Layout, Avatar, Badge, Space, Row } from 'antd'
+import { Menu, Dropdown, Layout, Avatar, Badge, Space, Row, Tag } from 'antd'
 import { SettingFilled, MenuUnfoldOutlined, RocketFilled, GithubFilled } from '@ant-design/icons'
-const { Header } = Layout
+import store from '@/store'
+import { useState } from 'react'
+import { connect } from 'react-redux'
 
+const mapStateToProps = state => {
+    if (state) {
+        return {
+            tagList: state
+        }
+    }
+}
 const AppHeader = props => {
     let { menuClick, avatar, menuToggle, loginOut } = props
+    const [tagList, setTagList] = useState([])
+    useEffect(() => {
+        store.subscribe(() => {
+            console.log('state状态改变了，新状态如下', store.getState().tagMenu.tagList)
+            console.log(props)
+            setTagList([...tagList, ...store.getState().tagMenu.tagList])
+        })
+    }, [])
+    const handleClose = (row, e) => {
+        e.preventDefault()
+        store.dispatch({
+            type: 'delete',
+            payload: row
+        })
+    }
     const menu = (
         <Menu>
             <Menu.ItemGroup title='用户设置'>
@@ -33,20 +57,18 @@ const AppHeader = props => {
         </Menu>
     )
     return (
-        <Header className='header'>
+        <Layout.Header className='header'>
             <div className='left'>
-                {/*<Icon*/}
-                {/*    style={{ fontSize: '2rem' }}*/}
-                {/*    onClick={menuClick}*/}
-                {/*    type={menuToggle ? 'menu-unfold' : 'menu-fold'}*/}
-                {/*/>*/}
+                {tagList &&
+                    tagList.map(item => {
+                        return (
+                            <Tag closable key={item.route} color='purple' onClose={handleClose.bind(this, item)}>
+                                {item.name}
+                            </Tag>
+                        )
+                    })}
             </div>
             <div className='right'>
-                <div className='mr15'>
-                    <a rel='noopener noreferrer' href='https://github.com/chen-wm/react-wf-admin' target='_blank'>
-                        <GithubFilled />
-                    </a>
-                </div>
                 <div className='mr15'>
                     <Badge dot={true} offset={[-2, 0]}>
                         <a href='https://github.com/chen-wm/react-wf-admin' style={{ color: '#000' }}>
@@ -62,7 +84,7 @@ const AppHeader = props => {
                     </Dropdown>
                 </div>
             </div>
-        </Header>
+        </Layout.Header>
     )
 }
 
@@ -73,4 +95,4 @@ AppHeader.propTypes = {
     loginOut: PropTypes.func
 }
 
-export default React.memo(AppHeader)
+export default connect(mapStateToProps)(AppHeader)

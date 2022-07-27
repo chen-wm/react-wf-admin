@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Menu } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
-
+import store from '@/store'
 class CustomMenu extends Component {
     state = {
         openKeys: [],
@@ -70,6 +70,13 @@ class CustomMenu extends Component {
             <Link
                 to={key}
                 onClick={() => {
+                    store.dispatch({
+                        type: 'increase',
+                        payload: {
+                            route: key,
+                            name: title
+                        }
+                    })
                     console.log(key, title)
                 }}>
                 <span>{title}</span>

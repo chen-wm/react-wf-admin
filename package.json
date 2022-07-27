@@ -26,9 +26,10 @@
     },
     "scripts": {
         "start": "dotenv -e .env.dev react-app-rewired start",
+        "start:fat": "dotenv -e .env.fat react-app-rewired start",
         "build": "dotenv -e .env.dev react-app-rewired build",
-        "build:fat": "dotenv -e .env.dev react-app-rewired build",
-        "build:prod": "dotenv -e .env.dev react-app-rewired build",
+        "build:fat": "dotenv -e .env.fat react-app-rewired build",
+        "build:prod": "dotenv -e .env.prod react-app-rewired build",
         "test": "react-app-rewired test",
         "eject": "react-scripts eject"
     },

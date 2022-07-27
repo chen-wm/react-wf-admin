@@ -149,7 +149,7 @@ service.interceptors.response.use(
             //     type: 'error',
             //     duration: 5 * 1000
             // });
-            console.log('error', res.message || res.msg || 'Error')
+            message.error(res.message || res.msg || 'Error')
             return Promise.reject(res)
         } else {
             return res

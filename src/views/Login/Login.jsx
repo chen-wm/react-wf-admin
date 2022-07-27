@@ -25,10 +25,9 @@ const Login = props => {
                     store.dispatch(action)
                     message.success('登录成功!')
                     props.history.push('/')
+                } else {
+                    message.error(res.message)
                 }
-            })
-            .catch(e => {
-                console.log(e)
             })
             .finally(() => setLoading(false))
     }

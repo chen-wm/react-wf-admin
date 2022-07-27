@@ -6,19 +6,13 @@ const ModalDialog = ({ flag, title, visible, onHide, refreshList, record }) => {
     const [form] = Form.useForm()
     useEffect(() => {
         if (visible && flag === 'edit') {
-            console.log(record)
             setTimeout(() => {
-                form.setFieldsValue({
-                    nickname: record.nickname,
-                    password: record.password,
-                    username: record.username
-                })
+                form.setFieldsValue(record)
             }, 0)
         }
     }, [visible])
     const onFinish = () => {
         let action = flag === 'add' ? addUser : writeUser
-        console.log(5, form.getFieldValue())
         let params = { ...form.getFieldValue() }
         if (flag === 'edit') {
             params.id = record.id
@@ -36,7 +30,6 @@ const ModalDialog = ({ flag, title, visible, onHide, refreshList, record }) => {
             })
             .catch(e => {
                 console.log(e)
-                form.resetFields()
             })
     }
 

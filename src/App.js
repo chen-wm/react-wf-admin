@@ -5,7 +5,8 @@ import 'animate.css'
 import './style/base.scss'
 import './style/App.scss'
 import './style/view-style/form.scss'
-
+import store from './store'
+import { Provider } from 'react-redux'
 // 公共模块
 const DefaultLayout = loadable(() => import(/* webpackChunkName: 'default' */ './containers'))
 
@@ -15,15 +16,17 @@ const View500 = loadable(() => import(/* webpackChunkName: '500' */ './views/Oth
 const Login = loadable(() => import(/* webpackChunkName: 'login' */ './views/Login'))
 
 const App = () => (
-    <Router>
-        <Switch>
-            <Route path='/' exact render={() => <Redirect to='/index' />} />
-            <Route path='/500' component={View500} />
-            <Route path='/login' component={Login} />
-            <Route path='/404' component={View404} />
-            <Route component={DefaultLayout} />
-        </Switch>
-    </Router>
+    <Provider store={store}>
+        <Router>
+            <Switch>
+                <Route path='/' exact render={() => <Redirect to='/index' />} />
+                <Route path='/500' component={View500} />
+                <Route path='/login' component={Login} />
+                <Route path='/404' component={View404} />
+                <Route component={DefaultLayout} />
+            </Switch>
+        </Router>
+    </Provider>
 )
 
 export default App
